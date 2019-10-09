@@ -3,7 +3,6 @@ var router = express.Router();
 var db = require('../db');
 
 router.get('/', function(req, res, next) {
-  // console.log('req.isAuthenticated()', req.isAuthenticated());
   db.getAllPosts()
     .then(function(data) {
       res.render('posts', { posts: data });

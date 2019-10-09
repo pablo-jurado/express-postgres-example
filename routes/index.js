@@ -1,16 +1,24 @@
 var express = require('express');
 var router = express.Router();
+var passport = require('../config/passport');
 
-// router.get('/', function(req, res, next) {
-//   res.render('login');
-// });
+router.post('/',
+  passport.authenticate('local', { failureRedirect: '/error' }),
+  function(req, res) {
+    res.redirect('/posts?username='+ req.user.email);
+});
 
-// router.get('/success', function(req, res) {
-//     res.send("Welcome " + req.query.username + "!!");
-// });
+router.get('/', function(req, res, next) {
+  res.render('login');
+});
 
-// router.get('/error', function (req, res) {
-//   res.send("error logging in");
-// });
+router.get('/logout', function(req, res, next) {
+  req.logout();
+  res.redirect('/');
+});
+
+router.get('/error', function (req, res) {
+  res.send("error logging in");
+});
 
 module.exports = router;
