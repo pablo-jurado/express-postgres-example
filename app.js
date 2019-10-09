@@ -1,5 +1,6 @@
 var createError = require('http-errors');
 var express = require('express');
+var session = require("express-session");
 var path = require('path');
 var cookieParser = require('cookie-parser');
 var logger = require('morgan');
@@ -18,6 +19,13 @@ app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'hbs');
 
 // middleware
+app.use(session({
+  secret: 'keyboard cat',
+  resave: false,
+  saveUninitialized: true,
+  cookie: {}
+}));
+
 app.use(passport.initialize());
 app.use(passport.session());
 app.use(logger('dev'));
@@ -25,6 +33,15 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
+
+
+app.all(/posts|users/, function(req, res, next) {
+  if(req.isAuthenticated()) {
+    next();
+  } else {
+    res.redirect('/');
+  }
+});
 
 // routes
 app.use('/', indexRouter);
@@ -50,24 +67,26 @@ function(email, password, done) {
   }
 ));
 
-passport.serializeUser(function(user, cb) {
-  cb(null, user.id);
+passport.serializeUser(function(user, done) {
+  done(null, user.id);
 });
 
-passport.deserializeUser(function(id, cb) {
+passport.deserializeUser(function(id, done) {
+  console.log('deserializeUser id:', id);
   db.findUserById(id)
     .then(function(user) {
-      console.log(user);
-      cb(null, user);
+      console.log('deserializeUser OK:', user);
+      done(null, user);
     }).catch(function(err) {
-      cb(err, null);
+      console.log('deserializeUser err:', err);
+      done(err, null);
     });
 });
 
 app.post('/',
   passport.authenticate('local', { failureRedirect: '/error' }),
   function(req, res) {
-    res.redirect('/success?username='+req.user.email);
+    res.redirect('/posts?username='+req.user.email);
 });
 
 app.get('/', function(req, res, next) {
@@ -78,7 +97,6 @@ app.get('/logout', function(req, res, next) {
   req.logout();
   res.redirect('/');
 });
-
 
 app.get('/success', function(req, res) {
     res.send("Welcome " + req.query.username + "!!");
