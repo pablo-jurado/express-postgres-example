@@ -5,6 +5,13 @@
     <link rel='stylesheet' href='/stylesheets/style.css' />
   </head>
   <body>
+    <nav>
+      <h1>The Tech Blog</h1>
+      {{#if user}}
+        <strong>User:</strong> {{ user }} | <a href="/logout">logout</a>
+      {{/if}}
+    </nav>
+    <hr>
     {{{body}}}
   </body>
 </html>

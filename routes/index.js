@@ -12,6 +12,10 @@ router.get('/', function(req, res, next) {
   res.render('login');
 });
 
+router.get('/signup', function(req, res, next) {
+  res.render('signup');
+});
+
 router.get('/logout', function(req, res, next) {
   req.logout();
   res.redirect('/');

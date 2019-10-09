@@ -5,7 +5,11 @@ var db = require('../db');
 router.get('/', function(req, res, next) {
   db.getAllPosts()
     .then(function(data) {
-      res.render('posts', { posts: data });
+      console.log(req.user);
+      res.render('posts', {
+        posts: data,
+        user: req.user.first_name
+      });
     }).catch(function(err) {
       res.status(404).send(err);
     });
@@ -16,7 +20,10 @@ router.get('/:id', function(req, res, next) {
   db.getSinglePost(id)
     .then(function(data) {
       console.log(data);
-      res.render('post', { post: data[0] });
+      res.render('post', {
+        post: data[0],
+        user: req.user.first_name
+      });
     }).catch(function(err) {
       res.status(404).send(err);
     });
