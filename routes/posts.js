@@ -1,16 +1,26 @@
 var express = require('express');
 var router = express.Router();
+var db = require('../db');
 
-// GET /posts
-// This should respond with the full list of blog posts.
 router.get('/', function(req, res, next) {
-  res.send('respond with a resource');
+  db.getAllPosts()
+    .then(function(data) {
+      res.render('posts', { posts: data });
+    }).catch(function(err) {
+      res.status(404).send(err);
+    });
 });
 
-// GET /posts/:id
-// This should respond with the matching post by id.
-// If the post does not exist, the server should respond
-// with a 404 status code.
+router.get('/:id', function(req, res, next) {
+  const id = parseInt(req.params.id, 10);
+  db.getSinglePost(id)
+    .then(function(data) {
+      console.log(data);
+      res.render('post', { post: data[0] });
+    }).catch(function(err) {
+      res.status(404).send(err);
+    });
+});
 
 
 // POST /posts
